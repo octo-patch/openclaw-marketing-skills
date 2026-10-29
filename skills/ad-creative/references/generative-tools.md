@@ -130,22 +130,21 @@ Specialized in typography and text rendering within images.
 
 ### MiniMax-H3
 
-MiniMax-H3 creates 2K videos with native audio from a required text prompt. Use it for 4-15 second ad concepts when you want a single asynchronous workflow for video and audio output.
+MiniMax-H3 creates 2K videos through an asynchronous task workflow. Each request requires text and can also include image, video, or audio inputs.
 
-**Best for:** Short 2K ad concepts with native audio and flexible aspect ratios
-**API:** Bearer-authenticated v2 task API
-**Pricing:** USD 0.13/output second on the global endpoint; CNY 0.80/output second on the China endpoint
+**Best for:** Short 2K ad concepts with flexible aspect ratios and multimodal inputs
+**API:** v2 task API
 
 **Endpoints:**
 - Global: `https://api.minimax.io/v2/video_generation`
 - China: `https://api.minimaxi.com/v2/video_generation`
 
-**Text-to-video requirements:**
+**Request requirements:**
 - `model`, `content`, `resolution`, and `duration` are required
-- `content` must include a non-empty `text` item of up to 7,000 characters
+- `content` accepts `text`, `image_url`, `video_url`, and `audio_url` items
+- A non-empty `text` item is required and can contain up to 7,000 characters
 - Use `resolution: "2K"` and an integer `duration` from 4 through 15 seconds
-- Text-only requests require a concrete `ratio`: `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, or `9:16`
-- `callback_url` is optional; China requests may also set `aigc_watermark`
+- `ratio` supports `adaptive`, `21:9`, `16:9`, `4:3`, `1:1`, `3:4`, and `9:16`
 
 **Create and query workflow:**
 ```bash
@@ -172,7 +171,7 @@ curl --request GET "$MINIMAX_BASE_URL/v2/query/video_generation/$TASK_ID" \
   --header "Authorization: Bearer $MINIMAX_API_KEY"
 ```
 
-The query response reports progress in `task.status`. Continue polling while it is `queued` or `running`; on `succeeded`, read the generated asset from `task.content.url`. Treat `failed` and `cancelled` as terminal states. Generated task records remain queryable for seven days.
+The create response returns a `task_id`. Query that task with `GET /v2/query/video_generation/{task_id}`.
 
 **Docs:** [Create a video generation task](https://platform.minimax.io/docs/api-reference/video-generation-v2-create), [query a task](https://platform.minimax.io/docs/api-reference/video-generation-v2-query)
 
@@ -321,7 +320,7 @@ Full-stack video creation platform with cinematic camera controls.
 
 | Tool | Max Length | Audio | Resolution | API | Best For |
 |------|-----------|-------|------------|-----|----------|
-| **MiniMax-H3** | 15 sec | Native | 2K | Official | Short high-resolution ads |
+| **MiniMax-H3** | 15 sec | Audio input | 2K | Official | Short high-resolution ads |
 | **Veo 3.1** | 60 sec | Native | 1080p/4K | Gemini | Vertical social video |
 | **Kling 2.6** | 3 min | Native | 1080p | Third-party | Longer cinematic |
 | **Runway Gen-4** | 10 sec | No | 1080p | Official | Controlled, consistent |
